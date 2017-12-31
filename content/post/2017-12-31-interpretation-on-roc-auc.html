@@ -1,0 +1,67 @@
+---
+title: Interpretation of AUC
+author: Jeno Pal
+date: '2017-12-31'
+slug: interpretation-on-roc-auc
+categories: []
+tags:
+  - Binary classification
+  - ROC
+  - AUC
+  - rstats
+---
+
+
+
+<p>One of the most widely used metric to evaluate binary classifiers is the <a href="https://en.wikipedia.org/wiki/Receiver_operating_characteristic#Area_under_the_curve">AUC</a> (“Area Under the Curve”) where “the Curve” refers to the Receiver Operating Characteristic (<a href="https://en.wikipedia.org/wiki/Receiver_operating_characteristic">ROC</a>) curve. It is well-known to be a measure between 0 and 1, the higher value meaning better performance. The perfect classifier correctly labelling all cases has a value 1 while a completely random classifier entails a score of 0.5.</p>
+<p>But what is the meaning of a score of 0.8 or 0.95? How much better is the latter than the former? A nice interpretation of the score is the following: <strong>if we take a random positive and a random negative case, AUC shows the probability that the classifier assigns a higher score to the positive case than to the negative</strong>.</p>
+<p>This interpretation is simple and intuitive – but why is it true? Instead of presenting theoretical arguments I provide here simulation evidence: I implement the interpretation and compare it to a built-in calculation of AUC using R.</p>
+<pre class="r"><code>library(tidyverse)
+library(ROCR)
+library(titanic)
+set.seed(42)</code></pre>
+<p>I use the “train” part of the <code>titanic</code> dataset and separate it to a train and a test sample.</p>
+<pre class="r"><code># data preparation
+data &lt;- titanic_train %&gt;% as_tibble()
+data &lt;- data %&gt;% select(Survived, Name, Sex, Fare)
+
+# check that name is a unique identifier
+n_unique_names &lt;- data %&gt;% select(Name) %&gt;% n_distinct()
+stopifnot(nrow(data) == n_unique_names)
+
+data_train &lt;- data %&gt;% sample_frac(0.5)
+data_test &lt;- anti_join(data, data_train, by = &quot;Name&quot;)</code></pre>
+<p>I use a simple logistic regression to model survival of Titanic passengers and calculate AUC using the <code>ROCR</code> package.</p>
+<pre class="r"><code># train a binary classifier
+model &lt;- glm(Survived ~ Sex + Fare, 
+             data = data_train, 
+             family = binomial(link = &quot;logit&quot;))
+
+# predict on test set
+predicted &lt;- predict.glm(model, newdata = data_test, type = &quot;response&quot;)
+data_test &lt;- data_test %&gt;% mutate(predicted = predicted)
+
+# calculate AUC
+prediction_obj &lt;- prediction(predicted, data_test %&gt;% select(Survived))
+auc &lt;- performance(prediction_obj, measure = &quot;auc&quot;)@y.values[[1]]</code></pre>
+<p>Then let’s calculate a measure based on the interpretation: I randomly draw positive and negative cases many times and calculate the share of draws where the positive has a higher score than the negative predicted by the model.</p>
+<pre class="r"><code># calculate the interpretation
+
+data_test_negative &lt;- data_test %&gt;% filter(Survived == 0)
+data_test_positive &lt;- data_test %&gt;% filter(Survived == 1)
+
+n_repetitions &lt;- 100000
+
+sample_negatives &lt;- sample(1:nrow(data_test_negative), n_repetitions, replace = TRUE)
+sample_positives &lt;- sample(1:nrow(data_test_positive), n_repetitions, replace = TRUE)
+
+scores_negatives &lt;- data_test_negative[sample_negatives, &quot;predicted&quot;]
+scores_positives &lt;- data_test_positive[sample_positives, &quot;predicted&quot;]
+
+simulated_auc &lt;- sum(scores_positives &gt; scores_negatives) / n_repetitions</code></pre>
+<p>Finally, let’s see the two AUCs:</p>
+<pre class="r"><code>print(paste0(&quot;AUC: &quot;, round(auc, 4)))</code></pre>
+<pre><code>## [1] &quot;AUC: 0.8298&quot;</code></pre>
+<pre class="r"><code>print(paste0(&quot;AUC from interpretation: &quot;, round(simulated_auc, 4)))</code></pre>
+<pre><code>## [1] &quot;AUC from interpretation: 0.8285&quot;</code></pre>
+<p>Indeed, the two are very close. We can conclude that the simple logistic model predicting survival based on the gender of the passenger and how much (s)he paid for the ticket performs decently: with 83% probability it assigns a higher score to a randomly chosen survivor than to a randomly chosen non-survivor.</p>
