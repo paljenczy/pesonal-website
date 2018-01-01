@@ -19,18 +19,12 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
     weight = 2
 [[menu.main]]
     name = "GitHub"
-    pre = "<i class='fa fa-heart'></i>"
     url = "https://github.com/paljenczy/"
     weight = 3
 [[menu.main]]
     name = "Twitter"
     url = "https://twitter.com/paljenczy"
     weight = 4
-    
-[social]
-    github  = "https://github.com/paljenczy"
-    twitter = "https://twitter.com/paljenczy"
-    stackoverflow = "https://stackoverflow.com/users/2795440/paljenczy"
 
 [params]
     description = "Personal website of Jeno Pal."
