@@ -1,5 +1,5 @@
 ---
-title: "Resume"
+title: "Me: Jeno Pal"
 date: "2017-12-29"
 ---
 
