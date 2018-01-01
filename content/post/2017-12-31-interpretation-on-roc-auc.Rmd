@@ -17,7 +17,7 @@ One of the most widely used metric to evaluate binary classifiers is the
 Characteristic ([ROC](https://en.wikipedia.org/wiki/Receiver_operating_characteristic))
 curve. It is well-known to be a measure between 0 and 1,
 the higher value meaning better performance. The perfect classifier correctly
-labelling all cases has a value 1 while a completely random classifier
+labeling all cases has a value 1 while a completely random classifier
 entails a score of 0.5.
 
 But what is the meaning of a score of 0.8 or 0.95? How much better is the latter
@@ -38,7 +38,7 @@ library(titanic)
 set.seed(42)
 ```
 
-I use the "train" part of the `titanic` dataset and separate it to a train
+I use the "train" part of the `titanic` data set and separate it to a train
 and a test sample.
 
 ```{r}
