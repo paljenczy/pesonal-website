@@ -19,6 +19,7 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
     weight = 2
 [[menu.main]]
     name = "GitHub"
+    pre = "<i class='fa fa-heart'></i>"
     url = "https://github.com/paljenczy/"
     weight = 3
 [[menu.main]]
