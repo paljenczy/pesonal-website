@@ -9,7 +9,7 @@ tags:
 categories: []
 ---
 
-Recently I had the pleasure of teaching at CEU (see in-progress course materials
+Recently I had the pleasure of teaching at [CEU](https://www.ceu.edu/) (see in-progress course materials
 [here](https://github.com/pappzoltan/teach-ML-CEU-master-bizanalytics)).
 One of the hardest concepts to explain turned out to be the role of validation
 and test sets.
